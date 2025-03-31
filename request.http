@@ -1,0 +1,14 @@
+POST http://localhost:5120/api/tasks
+Content-Type: application/json
+
+{
+    "title": "Task 2",
+    "description": "Description 1",
+    "status": "NEW",
+    "priority": "LOW",
+    "assignedTo": "User 1"
+}
+
+###
+
+GET http://localhost:5120/api/GetAllTasks/
