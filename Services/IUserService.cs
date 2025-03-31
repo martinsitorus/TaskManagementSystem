@@ -1,9 +1,17 @@
 public interface IUserService
 {
-    Task<User> Authenticate(string username, string password);
-    Task<IEnumerable<User>> GetAll();
-    Task<User> GetById(int id);
-    Task<User> Create(User user, string password);
-    Task Update(User user, string password);
-    Task Delete(int id);
+    Task<User> CreateUser(string username, string userID);
+    Task<User> GetUserByUserID(string userID);
+    Task<User> GetUserByUsername(string username);
+    // get all users
+    Task<List<User>> GetAllUsers();
+    // update user
+    Task<User> UpdateUser(string userID, string newUsername);
+    // delete user
+    Task<bool> DeleteUserByID(string userID);
+    Task<bool> DeleteUserByUsername(string userID);
+    // check if user exists
+    Task<bool> UserIDExists(string userID);
+    // check if username exists
+    Task<bool> UsernameExists(string username);
 }
