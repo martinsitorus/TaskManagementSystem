@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddSingleton<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 var app = builder.Build();
 
