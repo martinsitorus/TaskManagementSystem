@@ -10,4 +10,16 @@ public class TaskItem(string title, string description, User assignedTo, string 
     {
         Status = newStatus;
     }
+    public void UpdatePriority(string newPriority)
+    {
+        Priority = newPriority;
+    }
+    public void UpdateDueDate(DateOnly newDueDate)
+    {
+        DueDate = newDueDate;
+    }
+    public void UpdateAssignedTo(User newAssignedTo)
+    {
+        AssignedTo = newAssignedTo;
+    }
 }
