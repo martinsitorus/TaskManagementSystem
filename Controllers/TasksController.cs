@@ -12,33 +12,36 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("getalltasks")]
-    public IEnumerable<TaskItem> GetAllTasks()
+    public async Task<IEnumerable<TaskItem>> GetAllTasks()
     {
-        var tasks = _taskService.GetAllTasks();
+        var tasks = await _taskService.GetAllTasks();
         return tasks;
     }
 
     [HttpPost("createtask")]
-    public IActionResult CreateTask(TaskItem task)
+    public async Task<IActionResult> CreateTask(TaskItem task)
     {
-        var newTask = _taskService.CreateTask(task.Title, task.Description, task.AssignedTo, task.Priority, task.DueDate);
+        var newTask = await _taskService.CreateTask(task.Title, task.Description, task.AssignedTo, task.Priority, task.DueDate);
         return CreatedAtAction(nameof(GetAllTasks), new { id = newTask.Title }, newTask);
     }
     [HttpPut("updatetaskstatus")]
-    public IActionResult UpdateTaskStatus(string taskId, string newStatus)
+    public async Task<IActionResult> UpdateTaskStatus(string taskId, string newStatus)
     {
-        var task = _taskService.GetAllTasks().FirstOrDefault(t => t.Title == taskId);
+        var tasks = await _taskService.GetAllTasks();
+        var task = tasks.FirstOrDefault(t => t.Title == taskId);
         if (task == null)
         {
             return NotFound();
         }
-        _taskService.UpdateTaskStatus(task, newStatus);
+        // You should update via service, not directly on the entity
+        await _taskService.UpdateTask(taskId, newStatus, task.Priority, task.DueDate, task.AssignedTo);
         return NoContent();
     }
     [HttpPut("updatetaskpriority")]
-    public IActionResult UpdateTaskPriority(string taskId, string newPriority)
+    public async Task<IActionResult> UpdateTaskPriority(string taskId, string newPriority)
     {
-        var task = _taskService.GetAllTasks().FirstOrDefault(t => t.Title == taskId);
+        var tasks = await _taskService.GetAllTasks();
+        var task = tasks.FirstOrDefault(t => t.Title == taskId);
         if (task == null)
         {
             return NotFound();
@@ -47,9 +50,10 @@ public class TasksController : ControllerBase
         return NoContent();
     }
     [HttpPut("updatetaskduedate")]
-    public IActionResult UpdateTaskDueDate(string taskId, DateOnly newDueDate)
+    public async Task<IActionResult> UpdateTaskDueDate(string taskId, DateOnly newDueDate)
     {
-        var task = _taskService.GetAllTasks().FirstOrDefault(t => t.Title == taskId);
+        var tasks = await _taskService.GetAllTasks();
+        var task = tasks.FirstOrDefault(t => t.Title == taskId);
         if (task == null)
         {
             return NotFound();
@@ -58,9 +62,10 @@ public class TasksController : ControllerBase
         return NoContent();
     }
     [HttpPut("updatetaskassignedto")]
-    public IActionResult UpdateTaskAssignedTo(string taskId, User newAssignedTo)
+    public async Task<IActionResult> UpdateTaskAssignedTo(string taskId, User newAssignedTo)
     {
-        var task = _taskService.GetAllTasks().FirstOrDefault(t => t.Title == taskId);
+        var tasks = await _taskService.GetAllTasks();
+        var task = tasks.FirstOrDefault(t => t.Title == taskId);
         if (task == null)
         {
             return NotFound();
@@ -69,15 +74,16 @@ public class TasksController : ControllerBase
         return NoContent();
     }
     [HttpDelete("deletetask")]
-    public IActionResult DeleteTask(string taskId)
+    public async Task<IActionResult> DeleteTask(string taskId)
     {
-        _taskService.DeleteTask(taskId);
+        await _taskService.DeleteTask(taskId);
         return NoContent();
     }
     [HttpGet("gettaskbyid")]
-    public IActionResult GetTaskById(string taskId)
+    public async Task<IActionResult> GetTaskById(string taskId)
     {
-        var task = _taskService.GetAllTasks().FirstOrDefault(t => t.Title == taskId);
+        var tasks = await _taskService.GetAllTasks();
+        var task = tasks.FirstOrDefault(t => t.Title == taskId);
         if (task == null)
         {
             return NotFound();
@@ -85,14 +91,15 @@ public class TasksController : ControllerBase
         return Ok(task);
     }
     [HttpGet("gettaskbyassignedto")]
-    public IActionResult GetTaskByAssignedTo(string assignedTo)
+    public async Task<IActionResult> GetTaskByAssignedTo(string assignedTo)
     {
-        var tasks = _taskService.GetAllTasks().Where(t => t.AssignedTo.Username == assignedTo).ToList();
-        if (!tasks.Any())
+        var tasks = await _taskService.GetAllTasks();
+        var filtered = tasks.Where(t => t.AssignedTo.Username == assignedTo).ToList();
+        if (!filtered.Any())
         {
             return NotFound();
         }
-        return Ok(tasks);
+        return Ok(filtered);
     }
 
 }

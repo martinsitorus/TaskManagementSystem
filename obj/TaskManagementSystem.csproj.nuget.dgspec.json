@@ -1,26 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "/home/martin/Desktop/project/SatNusa/TaskManagementSystem/TaskManagementSystem.csproj": {}
+    "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/TaskManagementSystem.csproj": {}
   },
   "projects": {
-    "/home/martin/Desktop/project/SatNusa/TaskManagementSystem/TaskManagementSystem.csproj": {
+    "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/TaskManagementSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/martin/Desktop/project/SatNusa/TaskManagementSystem/TaskManagementSystem.csproj",
+        "projectUniqueName": "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/TaskManagementSystem.csproj",
         "projectName": "TaskManagementSystem",
-        "projectPath": "/home/martin/Desktop/project/SatNusa/TaskManagementSystem/TaskManagementSystem.csproj",
-        "packagesPath": "/home/martin/.nuget/packages/",
-        "outputPath": "/home/martin/Desktop/project/SatNusa/TaskManagementSystem/obj/",
+        "projectPath": "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/TaskManagementSystem.csproj",
+        "packagesPath": "/Users/martinsitorus/.nuget/packages/",
+        "outputPath": "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/martin/.nuget/NuGet/NuGet.Config"
+          "/Users/martinsitorus/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "/usr/lib/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -39,12 +38,16 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.3, )"
@@ -73,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.104/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

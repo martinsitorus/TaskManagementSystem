@@ -2,122 +2,70 @@ using System.Text.Json;
 
 public class UserService : IUserService
 {
-    private readonly string _filePath = "./Data/users.json";
-    private readonly List<User> _users = new List<User>();
+    private readonly IUserRepository _userRepository;
 
-    public UserService()
+    public UserService(IUserRepository userRepository)
     {
-        // Load users from JSON file at startup
-        if (File.Exists(_filePath))
-        {
-            var json = File.ReadAllText(_filePath);
-            var users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
-            _users.AddRange(users); // Add deserialized users to the existing list
-        }
-        else
-        {
-            _users = new List<User>();
-        }
+        _userRepository = userRepository;
     }
-    public void SaveUsersToFile()
-    {
-        var json = JsonSerializer.Serialize(_users);
-        File.WriteAllText(_filePath, json);
-    }
-    public void LoadUsersFromFile()
-    {
-        if (File.Exists(_filePath))
-        {
-            var json = File.ReadAllText(_filePath);
-            var users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
-            _users.Clear(); // Clear the existing list
-            _users.AddRange(users); // Add deserialized users to the list
-        }
-        else
-        {
-            _users.Clear(); // Ensure the list is empty if the file doesn't exist
-        }
-    }
+
     public async Task<User> CreateUser(string username, string userID)
     {
+        if (await _userRepository.UserIDExists(userID) || await _userRepository.UsernameExists(username))
+        {
+            throw new ArgumentException("UserID or Username already exists.");
+        }
+
         var user = new User(username, userID);
-        _users.Add(user);
-        SaveUsersToFile();
-        return await Task.FromResult(user);
+        await _userRepository.AddUser(user);
+        return user;
     }
 
-    public async Task<User> GetUserByUserID(string userID)
+    public async Task<User?> GetUserByUserID(string userID)
     {
-        LoadUsersFromFile(); // Load users from file before searching
-        var user = _users.FirstOrDefault(u => u.UserID == userID) ?? throw new KeyNotFoundException($"User with the specified ID was not found.");
-        return await Task.FromResult(user);
+        return await _userRepository.GetUserByUserID(userID);
     }
 
-    public async Task<User> GetUserByUsername(string username)
+    public async Task<User?> GetUserByUsername(string username)
     {
-        LoadUsersFromFile(); // Load users from file before searching
-        var user = _users.FirstOrDefault(u => u.Username == username) ?? throw new KeyNotFoundException($"User with the specified Username was not found.");
+        return await _userRepository.GetUserByUsername(username);
+    }
 
-        return await Task.FromResult(user);
-    }
-    public async Task<List<User>> GetAllUsers()
+    public async Task<IEnumerable<User>> GetAllUsers()
     {
-        LoadUsersFromFile(); // Load users from file before returning
-        if (_users.Count == 0)
-        {
-            throw new KeyNotFoundException("No users found.");
-        }
-        return await Task.FromResult(_users);
+        return await _userRepository.GetAllUsers();
     }
-    public async Task<User> UpdateUser(string userID, string newUsername)
+
+    public async Task<User?> UpdateUser(string userID, string newUsername)
     {
-        LoadUsersFromFile(); // Load users from file before updating
-        if (string.IsNullOrEmpty(newUsername))
+        if (!await _userRepository.UserIDExists(userID))
         {
-            throw new ArgumentException("New username cannot be null or empty.", nameof(newUsername));
+            return null;
         }
-        if (string.IsNullOrEmpty(userID))
-        {
-            throw new ArgumentException("User ID cannot be null or empty.", nameof(userID));
-        }
-        var user = _users.FirstOrDefault(u => u.UserID == userID) ?? throw new KeyNotFoundException($"User with the specified ID was not found.");
-        user.Username = newUsername;
-        return await Task.FromResult(user);
+
+        var success = await _userRepository.UpdateUser(userID, newUsername);
+        if (!success) return null;
+
+        return await _userRepository.GetUserByUserID(userID);
     }
+
     public async Task<bool> DeleteUserByID(string userID)
     {
-        LoadUsersFromFile();
-        var user = _users.FirstOrDefault(u => u.UserID == userID);
-        if (user != null)
-        {
-            _users.Remove(user);
-            SaveUsersToFile();
-            return await Task.FromResult(true);
-        }
-        return await Task.FromResult(false);
+        return await _userRepository.DeleteUserByID(userID);
     }
+
     public async Task<bool> DeleteUserByUsername(string username)
     {
-        LoadUsersFromFile(); // Load users from file before deleting
-        var user = _users.FirstOrDefault(u => u.Username == username);
-        if (user != null)
-        {
-            _users.Remove(user);
-            SaveUsersToFile();
-            return await Task.FromResult(true);
-        }
-        return await Task.FromResult(false);
+        return await _userRepository.DeleteUserByUsername(username);
     }
+
     public async Task<bool> UserIDExists(string userID)
     {
-        LoadUsersFromFile(); // Load users from file before checking existence
-        var exists = _users.Any(u => u.UserID == userID);
-        return await Task.FromResult(exists);
+        return await _userRepository.UserIDExists(userID);
     }
+
     public async Task<bool> UsernameExists(string username)
     {
-        LoadUsersFromFile(); // Load users from file before checking existence
-        var exists = _users.Any(u => u.Username == username);
-        return await Task.FromResult(exists);
+        return await _userRepository.UsernameExists(username);
     }
 }

@@ -1,99 +1,48 @@
 using System.Text.Json;
 public class TaskService : ITaskService
 {
-    private readonly string _filePath = "./Data/tasks.json";
-    private readonly List<TaskItem> _tasks = new List<TaskItem>();
+    private readonly ITaskRepository _taskRepository;
 
-    public TaskService()
+    public TaskService(ITaskRepository taskRepository)
     {
-        // Load tasks from JSON file at startup
-        if (File.Exists(_filePath))
-        {
-            var json = File.ReadAllText(_filePath);
-            var tasks = JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
-            _tasks.AddRange(tasks); // Add deserialized tasks to the existing list
-        }
-        else
-        {
-            _tasks = new List<TaskItem>();
-        }
-    }
-    public void SaveTasksToFile()
-    {
-        var json = JsonSerializer.Serialize(_tasks);
-        File.WriteAllText(_filePath, json);
-    }
-    public void LoadTasksFromFile()
-    {
-        if (File.Exists(_filePath))
-        {
-            var json = File.ReadAllText(_filePath);
-            var tasks = JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
-            _tasks.Clear(); // Clear the existing list
-            _tasks.AddRange(tasks); // Add deserialized tasks to the list
-        }
-        else
-        {
-            _tasks.Clear(); // Ensure the list is empty if the file doesn't exist
-        }
+        _taskRepository = taskRepository;
     }
 
-    public TaskItem CreateTask(string title, string description, User assignedTo, string priority, DateOnly dueDate)
+    public async Task<TaskItem> CreateTask(string title, string description, User assignedTo, string priority, DateOnly dueDate)
     {
         var task = new TaskItem(title, description, assignedTo, priority, dueDate);
-        _tasks.Add(task);
-        SaveTasksToFile();
-        return new TaskItem(title, description, assignedTo, priority, dueDate);
+        await _taskRepository.AddTaskAsync(task);
+        return task;
     }
 
-    public IEnumerable<TaskItem> GetAllTasks()
+    public async Task<IEnumerable<TaskItem>> GetAllTasks()
     {
-        LoadTasksFromFile();
-        return _tasks;
+        return await _taskRepository.GetAllTasksAsync();
     }
 
-    public void UpdateTaskStatus(TaskItem task, string newStatus)
+    public async Task<TaskItem?> GetTaskById(string taskId)
     {
-        LoadTasksFromFile();
-        task.UpdateStatus(newStatus);
+        return await _taskRepository.GetTaskByIdAsync(taskId);
     }
-    public void UpdateTaskPriority(TaskItem task, string newPriority)
+
+    public async Task UpdateTask(string taskId, string newStatus, string newPriority, DateOnly newDueDate, User newAssignedTo)
     {
-        LoadTasksFromFile();
-        task.UpdatePriority(newPriority);
-    }
-    public void UpdateTaskDueDate(TaskItem task, DateOnly newDueDate)
-    {
-        LoadTasksFromFile();
-        task.UpdateDueDate(newDueDate);
-    }
-    public void UpdateTaskAssignedTo(TaskItem task, User newAssignedTo)
-    {
-        LoadTasksFromFile();
-        task.UpdateAssignedTo(newAssignedTo);
-    }
-    public void UpdateTask(string taskId, string newStatus, string newPriority, DateOnly newDueDate, User newAssignedTo)
-    {
-        LoadTasksFromFile();
-        var task = GetAllTasks().FirstOrDefault(t => t.Title == taskId);
+        var task = await _taskRepository.GetTaskByIdAsync(taskId);
         if (task == null)
         {
             throw new Exception("Task not found");
         }
+
         task.UpdateStatus(newStatus);
         task.UpdatePriority(newPriority);
         task.UpdateDueDate(newDueDate);
         task.UpdateAssignedTo(newAssignedTo);
+
+        await _taskRepository.UpdateTaskAsync(task);
     }
-    public void DeleteTask(string taskId)
+
+    public async Task DeleteTask(string taskId)
     {
-        LoadTasksFromFile();
-        var task = GetAllTasks().FirstOrDefault(t => t.Title == taskId);
-        if (task == null)
-        {
-            throw new Exception("Task not found");
-        }
-        _tasks.Remove(task);
-        SaveTasksToFile();
+        await _taskRepository.DeleteTaskAsync(taskId);
     }
 }
