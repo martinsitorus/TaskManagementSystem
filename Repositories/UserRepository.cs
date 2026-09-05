@@ -2,11 +2,12 @@ using System.Text.Json;
 
 public class UserRepository : IUserRepository
 {
-    private readonly string _filePath = "users.json";
-    private List<User> _users;
+    private readonly string _filePath;
+    private readonly List<User> _users;
 
-    public UserRepository()
+    public UserRepository(string? filePath = null)
     {
+        _filePath = filePath ?? "./Data/users.json";
         _users = LoadUsersFromFile();
     }
 
@@ -17,12 +18,25 @@ public class UserRepository : IUserRepository
             return new List<User>();
         }
 
-        var json = File.ReadAllText(_filePath);
-        return JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
+        try
+        {
+            var json = File.ReadAllText(_filePath);
+            return JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
+        }
+        catch (JsonException)
+        {
+            // Corrupt seed/data file: start empty rather than crashing the app.
+            return new List<User>();
+        }
     }
 
     private void SaveUsersToFile()
     {
+        var directory = Path.GetDirectoryName(_filePath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
         var json = JsonSerializer.Serialize(_users);
         File.WriteAllText(_filePath, json);
     }
@@ -34,7 +48,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetUserByUsername(string username)
     {
-        return await Task.FromResult(_users.FirstOrDefault(u => u.Username == username));
+        return await Task.FromResult(
+            _users.FirstOrDefault(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase)));
     }
 
     public async Task<IEnumerable<User>> GetAllUsers()
@@ -71,7 +86,7 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> DeleteUserByUsername(string username)
     {
-        var user = _users.FirstOrDefault(u => u.Username == username);
+        var user = _users.FirstOrDefault(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
         if (user == null) return false;
 
         _users.Remove(user);
@@ -86,6 +101,7 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> UsernameExists(string username)
     {
-        return await Task.FromResult(_users.Any(u => u.Username == username));
+        return await Task.FromResult(
+            _users.Any(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase)));
     }
 }

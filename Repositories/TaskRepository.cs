@@ -2,11 +2,12 @@ using System.Text.Json;
 
 public class TaskRepository : ITaskRepository
 {
-    private readonly string _filePath = "./Data/tasks.json";
-    private List<TaskItem> _tasks;
+    private readonly string _filePath;
+    private readonly List<TaskItem> _tasks;
 
-    public TaskRepository()
+    public TaskRepository(string? filePath = null)
     {
+        _filePath = filePath ?? "./Data/tasks.json";
         _tasks = LoadTasksFromFile();
     }
 
@@ -17,12 +18,31 @@ public class TaskRepository : ITaskRepository
             return new List<TaskItem>();
         }
 
-        var json = File.ReadAllText(_filePath);
-        return JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
+        try
+        {
+            var json = File.ReadAllText(_filePath);
+            var tasks = JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
+            // Backfill ids for entries persisted before ids were introduced.
+            foreach (var task in tasks.Where(t => string.IsNullOrEmpty(t.Id)))
+            {
+                task.Id = Guid.NewGuid().ToString();
+            }
+            return tasks;
+        }
+        catch (JsonException)
+        {
+            // Corrupt seed/data file: start empty rather than crashing the app.
+            return new List<TaskItem>();
+        }
     }
 
     private void SaveTasksToFile()
     {
+        var directory = Path.GetDirectoryName(_filePath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
         var json = JsonSerializer.Serialize(_tasks);
         File.WriteAllText(_filePath, json);
     }
@@ -35,6 +55,12 @@ public class TaskRepository : ITaskRepository
     public async Task<TaskItem?> GetTaskByIdAsync(string taskId)
     {
         return await Task.FromResult(_tasks.FirstOrDefault(t => t.Id == taskId));
+    }
+
+    public async Task<TaskItem?> GetTaskByTitleAsync(string title)
+    {
+        return await Task.FromResult(
+            _tasks.FirstOrDefault(t => t.Title.Equals(title, StringComparison.OrdinalIgnoreCase)));
     }
 
     public async Task AddTaskAsync(TaskItem task)

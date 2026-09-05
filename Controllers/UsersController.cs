@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, ILogger<UsersController> logger)
     {
         _userService = userService;
+        _logger = logger;
     }
 
     [HttpPost("createUser")]
@@ -20,6 +22,7 @@ public class UsersController : ControllerBase
         }
 
         var createdUser = await _userService.CreateUser(user.Username, user.UserID);
+        _logger.LogInformation("API: created user '{Username}'.", createdUser.Username);
         return CreatedAtAction(nameof(GetUserByUserID), new { userID = createdUser.UserID }, createdUser);
     }
     

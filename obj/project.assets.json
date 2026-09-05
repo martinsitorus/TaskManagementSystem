@@ -597,24 +597,25 @@
     ]
   },
   "packageFolders": {
-    "/Users/martinsitorus/.nuget/packages/": {}
+    "/home/martin/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/TaskManagementSystem.csproj",
+      "projectUniqueName": "/home/martin/Desktop/project/C#/TaskManagementSystem/TaskManagementSystem.csproj",
       "projectName": "TaskManagementSystem",
-      "projectPath": "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/TaskManagementSystem.csproj",
-      "packagesPath": "/Users/martinsitorus/.nuget/packages/",
-      "outputPath": "/Users/martinsitorus/Desktop/Repository/dotNet/TaskManagementSystem/TaskManagementSystem/obj/",
+      "projectPath": "/home/martin/Desktop/project/C#/TaskManagementSystem/TaskManagementSystem.csproj",
+      "packagesPath": "/home/martin/.nuget/packages/",
+      "outputPath": "/home/martin/Desktop/project/C#/TaskManagementSystem/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/martinsitorus/.nuget/NuGet/NuGet.Config"
+        "/home/martin/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "/usr/lib/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -633,7 +634,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net9.0": {
@@ -671,7 +672,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.202/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.120/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

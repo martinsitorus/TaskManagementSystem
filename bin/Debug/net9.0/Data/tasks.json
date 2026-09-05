@@ -1,1 +1,1 @@
-[{"Title":"string","Description":"string","DueDate":"2025-04-01","Priority":"string","Status":"To Do","AssignedTo":{"Username":"string","UserID":"string"}}]
+[{"AssignedTo":{"UserID":"002","Username":"Tommy"},"Description":"Sample task seeded for demo purposes.","DueDate":"2026-12-31","Id":"seed-task-001","Priority":"Medium","Status":"To Do","Title":"Welcome task"}]

@@ -1,15 +1,17 @@
 # Task Management System
 
-A simple .NET 9 Web API for managing tasks and users.
+A .NET 9 Web API for managing tasks and users. Tasks are looked up by **title** in the API routes.
+
 ---
 
 ## Features
 
 - Create, update, delete, and retrieve users and tasks
-- Assign tasks to users
-- Validation using FluentValidation
-- Repository pattern for data access
-- Unit tests with xUnit and Moq
+- Assign tasks to users (assignee must exist)
+- Validation using FluentValidation (due date cannot be in the past; Priority must be Low/Medium/High; Status must be To Do/In Progress/Done)
+- Repository pattern with JSON-file persistence (`Data/tasks.json`, `Data/users.json`)
+- Logging of critical operations via `ILogger`
+- Unit tests with xUnit and Moq (34 tests)
 - API documentation with Swagger
 
 ---
@@ -25,6 +27,8 @@ A simple .NET 9 Web API for managing tasks and users.
 
 ### How to Run
 
+From the `TaskManagementSystem` folder:
+
 1. **Restore dependencies:**
     ```bash
     dotnet restore
@@ -37,23 +41,19 @@ A simple .NET 9 Web API for managing tasks and users.
 
 3. **Run the API:**
     ```bash
-    dotnet run --project TaskManagementSystem/TaskManagementSystem.csproj
+    dotnet run
     ```
-    The API will start (by default on https://localhost:5001 or http://localhost:5000).
+    The API starts on `http://localhost:5120` (see `Properties/launchSettings.json`).
 
 ---
 
 ### How to Test
 
-1. **Navigate to the test project folder (if not already there):**
-    ```bash
-    cd TaskManagementSystem.Tests
-    ```
+From the `TaskManagementSystem` folder (runs the `TaskManagementSystem.Tests` project in the solution):
 
-2. **Run all unit tests:**
-    ```bash
-    dotnet test
-    ```
+```bash
+dotnet test
+```
 
 ---
 
@@ -62,20 +62,34 @@ A simple .NET 9 Web API for managing tasks and users.
 1. **Start the API** (see "How to Run" above).
 2. **Open your browser and go to:**
     ```
-    https://localhost:5001/swagger
-    ```
-    or
-    ```
-    http://localhost:5000/swagger
+    http://localhost:5120/swagger
     ```
 3. **You will see the Swagger UI** where you can try out all API endpoints interactively.
 
 ---
 
+## API quick reference
+
+Tasks (`api/tasks`):
+
+- `GET api/tasks/getalltasks`
+- `POST api/tasks/createtask` — body: `{ "title", "description", "dueDate": "2026-12-31", "priority": "High", "assignedTo": { "username": "Tommy", "userID": "002" } }`
+- `GET api/tasks/gettaskbyid?taskId={title}`
+- `GET api/tasks/gettaskbyassignedto?assignedTo={username}`
+- `PUT api/tasks/updatetaskstatus?taskId={title}&newStatus=Done`
+- `PUT api/tasks/updatetaskpriority?taskId={title}&newPriority=High`
+- `PUT api/tasks/updatetaskduedate?taskId={title}&newDueDate=2026-12-31`
+- `PUT api/tasks/updatetaskassignedto?taskId={title}` — body: `{ "username": "Tommy", "userID": "002" }`
+- `DELETE api/tasks/deletetask?taskId={title}`
+
+Users (`api/users`): `createUser`, `getUserByUserID/{userID}`, `getUserByUsername/{username}`, `getAllUsers`, `updateUser/{userID}`, `deleteUserByID/{userID}`, `deleteUserByUsername/{username}`, `userIDExists/{userID}`, `usernameExists/{username}`.
+
+---
+
 ## Notes
 
-- All validation errors will return a 400 Bad Request with details.
-- Data is persisted in JSON files for demo purposes.
+- All validation errors return a 400 Bad Request with details; missing resources return 404.
+- Data is persisted in JSON files under `Data/` for demo purposes.
 - For production, replace the repository implementations with a real database provider.
 
 ---
