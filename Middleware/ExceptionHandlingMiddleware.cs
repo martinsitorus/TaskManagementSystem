@@ -1,5 +1,8 @@
 using System.Net;
 using System.Text.Json;
+using TaskManagementSystem.Domain.Exceptions;
+
+namespace TaskManagementSystem.Api.Middleware;
 
 public class ExceptionHandlingMiddleware
 {
@@ -28,7 +31,9 @@ public class ExceptionHandlingMiddleware
     {
         var (statusCode, title) = ex switch
         {
+            TaskNotFoundException => (HttpStatusCode.NotFound, "Resource not found."),
             KeyNotFoundException => (HttpStatusCode.NotFound, "Resource not found."),
+            UserAlreadyExistsException => (HttpStatusCode.Conflict, "Resource already exists."),
             ArgumentException => (HttpStatusCode.BadRequest, "Invalid request."),
             _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
         };

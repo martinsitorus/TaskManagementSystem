@@ -1,6 +1,6 @@
 @TaskManagementSystem_HostAddress = http://localhost:5120
 
-GET {{TaskManagementSystem_HostAddress}}/api/tasks/getalltasks
+GET {{TaskManagementSystem_HostAddress}}/api/tasks
 Accept: application/json
 
 ###

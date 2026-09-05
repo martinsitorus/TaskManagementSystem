@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagementSystem.Application.Abstractions;
+using TaskManagementSystem.Application.DTOs;
+
+namespace TaskManagementSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/tasks")]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -13,85 +17,16 @@ public class TasksController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("getalltasks")]
-    public async Task<IEnumerable<TaskItem>> GetAllTasks()
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<TaskDto>>> GetAll()
     {
-        var tasks = await _taskService.GetAllTasks();
-        return tasks;
+        return Ok(await _taskService.GetAllTasksAsync());
     }
 
-    [HttpPost("createtask")]
-    public async Task<IActionResult> CreateTask(TaskItem task)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<TaskDto>> GetById(string id)
     {
-        var newTask = await _taskService.CreateTask(task.Title, task.Description, task.AssignedTo, task.Priority, task.DueDate);
-        _logger.LogInformation("API: created task '{Title}'.", newTask.Title);
-        return CreatedAtAction(nameof(GetTaskById), new { taskId = newTask.Title }, newTask);
-    }
-
-    [HttpPut("updatetaskstatus")]
-    public async Task<IActionResult> UpdateTaskStatus(string taskId, string newStatus)
-    {
-        var task = await _taskService.GetTaskByTitle(taskId);
-        if (task == null)
-        {
-            return NotFound();
-        }
-        await _taskService.UpdateTask(taskId, newStatus, task.Priority, task.DueDate, task.AssignedTo);
-        return NoContent();
-    }
-
-    [HttpPut("updatetaskpriority")]
-    public async Task<IActionResult> UpdateTaskPriority(string taskId, string newPriority)
-    {
-        var task = await _taskService.GetTaskByTitle(taskId);
-        if (task == null)
-        {
-            return NotFound();
-        }
-        await _taskService.UpdateTask(taskId, task.Status, newPriority, task.DueDate, task.AssignedTo);
-        return NoContent();
-    }
-
-    [HttpPut("updatetaskduedate")]
-    public async Task<IActionResult> UpdateTaskDueDate(string taskId, DateOnly newDueDate)
-    {
-        var task = await _taskService.GetTaskByTitle(taskId);
-        if (task == null)
-        {
-            return NotFound();
-        }
-        await _taskService.UpdateTask(taskId, task.Status, task.Priority, newDueDate, task.AssignedTo);
-        return NoContent();
-    }
-
-    [HttpPut("updatetaskassignedto")]
-    public async Task<IActionResult> UpdateTaskAssignedTo(string taskId, User newAssignedTo)
-    {
-        var task = await _taskService.GetTaskByTitle(taskId);
-        if (task == null)
-        {
-            return NotFound();
-        }
-        await _taskService.UpdateTask(taskId, task.Status, task.Priority, task.DueDate, newAssignedTo);
-        return NoContent();
-    }
-
-    [HttpDelete("deletetask")]
-    public async Task<IActionResult> DeleteTask(string taskId)
-    {
-        var deleted = await _taskService.DeleteTask(taskId);
-        if (!deleted)
-        {
-            _logger.LogWarning("API: delete failed, task '{Title}' not found.", taskId);
-            return NotFound();
-        }
-        return NoContent();
-    }
-
-    [HttpGet("gettaskbyid")]
-    public async Task<IActionResult> GetTaskById(string taskId)
-    {
-        var task = await _taskService.GetTaskByTitle(taskId);
+        var task = await _taskService.GetTaskByIdAsync(id);
         if (task == null)
         {
             return NotFound();
@@ -99,14 +34,53 @@ public class TasksController : ControllerBase
         return Ok(task);
     }
 
-    [HttpGet("gettaskbyassignedto")]
-    public async Task<IActionResult> GetTaskByAssignedTo(string assignedTo)
+    [HttpPost]
+    public async Task<ActionResult<TaskDto>> Create([FromBody] CreateTaskDto task)
     {
-        var filtered = (await _taskService.GetTasksByUsername(assignedTo)).ToList();
-        if (!filtered.Any())
+        var created = await _taskService.CreateTaskAsync(task);
+        _logger.LogInformation("API: created task id {TaskId}.", created.Id);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<TaskDto>> Update(string id, [FromBody] UpdateTaskDto task)
+    {
+        return Ok(await _taskService.UpdateTaskAsync(id, task));
+    }
+
+    [HttpPatch("{id}/status")]
+    public async Task<ActionResult<TaskDto>> UpdateStatus(string id, [FromBody] PatchTaskStatusDto patch)
+    {
+        return Ok(await _taskService.UpdateTaskStatusAsync(id, patch.Status));
+    }
+
+    [HttpPatch("{id}/priority")]
+    public async Task<ActionResult<TaskDto>> UpdatePriority(string id, [FromBody] PatchTaskPriorityDto patch)
+    {
+        return Ok(await _taskService.UpdateTaskPriorityAsync(id, patch.Priority));
+    }
+
+    [HttpPatch("{id}/due-date")]
+    public async Task<ActionResult<TaskDto>> UpdateDueDate(string id, [FromBody] PatchTaskDueDateDto patch)
+    {
+        return Ok(await _taskService.UpdateTaskDueDateAsync(id, patch.DueDate));
+    }
+
+    [HttpPatch("{id}/assignee")]
+    public async Task<ActionResult<TaskDto>> Assign(string id, [FromBody] AssignTaskDto patch)
+    {
+        return Ok(await _taskService.AssignTaskAsync(id, patch.AssignedTo));
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await _taskService.DeleteTaskAsync(id);
+        if (!deleted)
         {
+            _logger.LogWarning("API: delete failed, task id '{TaskId}' not found.", id);
             return NotFound();
         }
-        return Ok(filtered);
+        return NoContent();
     }
 }

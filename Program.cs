@@ -1,16 +1,22 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using TaskManagementSystem.Api.Middleware;
+using TaskManagementSystem.Application.Abstractions;
+using TaskManagementSystem.Application.Services;
+using TaskManagementSystem.Application.Validation;
+using TaskManagementSystem.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskDtoValidator>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register repositories and services
+// Clean architecture wiring: abstractions live in Application,
+// implementations in Infrastructure.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();

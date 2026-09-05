@@ -117,3 +117,12 @@
 /home/martin/Desktop/project/C#/TaskManagementSystem/obj/Debug/net9.0/TaskMana.27CB023B.Up2Date
 /home/martin/Desktop/project/C#/TaskManagementSystem/obj/Debug/net9.0/TaskManagementSystem.genruntimeconfig.cache
 /home/martin/Desktop/project/C#/TaskManagementSystem/obj/Debug/net9.0/ref/TaskManagementSystem.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/System.Diagnostics.DiagnosticSource.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/TaskManagementSystem.Application.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/TaskManagementSystem.Domain.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/TaskManagementSystem.Infrastructure.dll
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/TaskManagementSystem.Application.pdb
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/TaskManagementSystem.Infrastructure.pdb
+/home/martin/Desktop/project/C#/TaskManagementSystem/bin/Debug/net9.0/TaskManagementSystem.Domain.pdb

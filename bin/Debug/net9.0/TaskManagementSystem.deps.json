@@ -10,23 +10,26 @@
         "dependencies": {
           "FluentValidation.AspNetCore": "11.3.0",
           "Microsoft.AspNetCore.OpenApi": "9.0.3",
-          "Swashbuckle.AspNetCore": "8.0.0"
+          "Swashbuckle.AspNetCore": "8.0.0",
+          "TaskManagementSystem.Application": "1.0.0",
+          "TaskManagementSystem.Domain": "1.0.0",
+          "TaskManagementSystem.Infrastructure": "1.0.0"
         },
         "runtime": {
           "TaskManagementSystem.dll": {}
         }
       },
-      "FluentValidation/11.5.1": {
+      "FluentValidation/11.11.0": {
         "runtime": {
-          "lib/net7.0/FluentValidation.dll": {
+          "lib/net8.0/FluentValidation.dll": {
             "assemblyVersion": "11.0.0.0",
-            "fileVersion": "11.5.1.0"
+            "fileVersion": "11.11.0.0"
           }
         }
       },
       "FluentValidation.AspNetCore/11.3.0": {
         "dependencies": {
-          "FluentValidation": "11.5.1",
+          "FluentValidation": "11.11.0",
           "FluentValidation.DependencyInjectionExtensions": "11.5.1"
         },
         "runtime": {
@@ -38,8 +41,8 @@
       },
       "FluentValidation.DependencyInjectionExtensions/11.5.1": {
         "dependencies": {
-          "FluentValidation": "11.5.1",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
+          "FluentValidation": "11.11.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.11"
         },
         "runtime": {
           "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll": {
@@ -60,7 +63,26 @@
         }
       },
       "Microsoft.Extensions.ApiDescription.Server/6.0.5": {},
-      "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {},
+      "Microsoft.Extensions.DependencyInjection.Abstractions/10.0.11": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1126.37416"
+          }
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions/10.0.11": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.11",
+          "System.Diagnostics.DiagnosticSource": "10.0.11"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1126.37416"
+          }
+        }
+      },
       "Microsoft.OpenApi/1.6.23": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.OpenApi.dll": {
@@ -106,6 +128,47 @@
             "fileVersion": "8.0.0.1197"
           }
         }
+      },
+      "System.Diagnostics.DiagnosticSource/10.0.11": {
+        "runtime": {
+          "lib/net9.0/System.Diagnostics.DiagnosticSource.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1126.37416"
+          }
+        }
+      },
+      "TaskManagementSystem.Application/1.0.0": {
+        "dependencies": {
+          "FluentValidation": "11.11.0",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.11",
+          "TaskManagementSystem.Domain": "1.0.0"
+        },
+        "runtime": {
+          "TaskManagementSystem.Application.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "TaskManagementSystem.Domain/1.0.0": {
+        "runtime": {
+          "TaskManagementSystem.Domain.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "TaskManagementSystem.Infrastructure/1.0.0": {
+        "dependencies": {
+          "TaskManagementSystem.Application": "1.0.0",
+          "TaskManagementSystem.Domain": "1.0.0"
+        },
+        "runtime": {
+          "TaskManagementSystem.Infrastructure.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -115,12 +178,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "FluentValidation/11.5.1": {
+    "FluentValidation/11.11.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-0h1Q5lNOLLyYTWMJmyNoMqhY4CBRvvUWvJP1R4F2CnmmzuWwvB0A8aVmw5+lOuwYnwUwCRrdeMLbc81F38ahNQ==",
-      "path": "fluentvalidation/11.5.1",
-      "hashPath": "fluentvalidation.11.5.1.nupkg.sha512"
+      "sha512": "sha512-cyIVdQBwSipxWG8MA3Rqox7iNbUNUTK5bfJi9tIdm4CAfH71Oo5ABLP4/QyrUwuakqpUEPGtE43BDddvEehuYw==",
+      "path": "fluentvalidation/11.11.0",
+      "hashPath": "fluentvalidation.11.11.0.nupkg.sha512"
     },
     "FluentValidation.AspNetCore/11.3.0": {
       "type": "package",
@@ -150,12 +213,19 @@
       "path": "microsoft.extensions.apidescription.server/6.0.5",
       "hashPath": "microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512"
     },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {
+    "Microsoft.Extensions.DependencyInjection.Abstractions/10.0.11": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ==",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/2.1.0",
-      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg.sha512"
+      "sha512": "sha512-/a1aJz4m7ylhEDf25ugQChLQoN5XwoGjWw/BoR/ZWWKsO1v4DdJElS1uyngahz4B/eOzjFk1KNTkarRLE5wsIg==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/10.0.11",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.10.0.11.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging.Abstractions/10.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ljd0Uxoq5XpScD2Bg0nM/r3mwx7Ao5Uq24eo2ARxbGvqJ7Zht6rt2cJtwVRH4Cv+1ZVMdXz6TB43KbpmsxRrvQ==",
+      "path": "microsoft.extensions.logging.abstractions/10.0.11",
+      "hashPath": "microsoft.extensions.logging.abstractions.10.0.11.nupkg.sha512"
     },
     "Microsoft.OpenApi/1.6.23": {
       "type": "package",
@@ -191,6 +261,28 @@
       "sha512": "sha512-IMqmgclFiZL2QIfopOmWYofZzckrl+SdMt1h4mKC0jc94F+uzt3IHA3YFC0CGlwBqTTSnxHqNUKomNTeAhZbYA==",
       "path": "swashbuckle.aspnetcore.swaggerui/8.0.0",
       "hashPath": "swashbuckle.aspnetcore.swaggerui.8.0.0.nupkg.sha512"
+    },
+    "System.Diagnostics.DiagnosticSource/10.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QoXcAdDhBudxorzYF1F5Uo7FY0CSWgmTjqVRJjcQaYAkbO3dCPXDJajJwyApTGHCJ+T5PfVyKZqXEKZ8PH+UWQ==",
+      "path": "system.diagnostics.diagnosticsource/10.0.11",
+      "hashPath": "system.diagnostics.diagnosticsource.10.0.11.nupkg.sha512"
+    },
+    "TaskManagementSystem.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TaskManagementSystem.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TaskManagementSystem.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

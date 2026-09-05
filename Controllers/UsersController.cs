@@ -1,102 +1,93 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagementSystem.Application.Abstractions;
+using TaskManagementSystem.Application.DTOs;
+
+namespace TaskManagementSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ITaskService _taskService;
     private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IUserService userService, ILogger<UsersController> logger)
+    public UsersController(
+        IUserService userService,
+        ITaskService taskService,
+        ILogger<UsersController> logger)
     {
         _userService = userService;
+        _taskService = taskService;
         _logger = logger;
     }
 
-    [HttpPost("createUser")]
-    public async Task<IActionResult> CreateUser([FromBody] User user)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAll([FromQuery] string? username)
     {
-        if (user == null || string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.UserID))
+        if (!string.IsNullOrEmpty(username))
         {
-            return BadRequest("Invalid user data.");
+            var user = await _userService.GetUserByUsernameAsync(username);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            return Ok(new[] { user });
         }
-
-        var createdUser = await _userService.CreateUser(user.Username, user.UserID);
-        _logger.LogInformation("API: created user '{Username}'.", createdUser.Username);
-        return CreatedAtAction(nameof(GetUserByUserID), new { userID = createdUser.UserID }, createdUser);
+        return Ok(await _userService.GetAllUsersAsync());
     }
-    
-    [HttpGet("getUserByUserID/{userID}")]
-    public async Task<IActionResult> GetUserByUserID(string userID)
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserDto>> GetById(string id)
     {
-        var user = await _userService.GetUserByUserID(userID);
+        var user = await _userService.GetUserByIdAsync(id);
         if (user == null)
         {
             return NotFound("User not found.");
         }
         return Ok(user);
     }
-    [HttpGet("getUserByUsername/{username}")]
-    public async Task<IActionResult> GetUserByUsername(string username)
-    {
-        var user = await _userService.GetUserByUsername(username);
-        if (user == null)
-        {
-            return NotFound("User not found.");
-        }
-        return Ok(user);
-    }
-    [HttpGet("getAllUsers")]
-    public async Task<IActionResult> GetAllUsers()
-    {
-        var users = await _userService.GetAllUsers();
-        return Ok(users);
-    }
-    [HttpPut("updateUser/{userID}")]
-    public async Task<IActionResult> UpdateUser(string userID, [FromBody] string newUsername)
-    {
-        if (string.IsNullOrEmpty(newUsername))
-        {
-            return BadRequest("Invalid username.");
-        }
 
-        var updatedUser = await _userService.UpdateUser(userID, newUsername);
-        if (updatedUser == null)
+    [HttpGet("{id}/tasks")]
+    public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks(string id)
+    {
+        if (!await UserExists(id))
         {
             return NotFound("User not found.");
         }
-        return Ok(updatedUser);
+        return Ok(await _taskService.GetTasksByUserIdAsync(id));
     }
-    [HttpDelete("deleteUserByID/{userID}")]
-    public async Task<IActionResult> DeleteUserByID(string userID)
+
+    [HttpPost]
+    public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto user)
     {
-        var deleted = await _userService.DeleteUserByID(userID);
+        var created = await _userService.CreateUserAsync(user);
+        _logger.LogInformation("API: created user '{Username}'.", created.Username);
+        return CreatedAtAction(nameof(GetById), new { id = created.UserID }, created);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<UserDto>> Update(string id, [FromBody] UpdateUserDto user)
+    {
+        var updated = await _userService.UpdateUserAsync(id, user);
+        if (updated == null)
+        {
+            return NotFound("User not found.");
+        }
+        return Ok(updated);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await _userService.DeleteUserAsync(id);
         if (!deleted)
         {
             return NotFound("User not found.");
         }
         return NoContent();
     }
-    [HttpDelete("deleteUserByUsername/{username}")]
-    public async Task<IActionResult> DeleteUserByUsername(string username)
-    {
-        var deleted = await _userService.DeleteUserByUsername(username);
-        if (!deleted)
-        {
-            return NotFound("User not found.");
-        }
-        return NoContent();
-    }
-    [HttpGet("userIDExists/{userID}")]
-    public async Task<IActionResult> UserIDExists(string userID)
-    {
-        var exists = await _userService.UserIDExists(userID);
-        return Ok(new { exists });
-    }
-    [HttpGet("usernameExists/{username}")]
-    public async Task<IActionResult> UsernameExists(string username)
-    {
-        var exists = await _userService.UsernameExists(username);
-        return Ok(new { exists });
-    }
+
+    private async Task<bool> UserExists(string id) =>
+        await _userService.GetUserByIdAsync(id) != null;
 }

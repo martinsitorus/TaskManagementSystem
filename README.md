@@ -1,6 +1,14 @@
 # Task Management System
 
-A .NET 9 Web API for managing tasks and users. Tasks are looked up by **title** in the API routes.
+A .NET 9 Web API for managing tasks and users, built with clean architecture:
+
+- **TaskManagementSystem.Domain** — entities (`TaskItem`, `User`), enums (`TaskPriority`, `TaskState`), domain exceptions
+- **TaskManagementSystem.Application** — DTOs, repository/service ports, services, FluentValidation validators
+- **TaskManagementSystem.Infrastructure** — JSON-file repository implementations
+- **TaskManagementSystem.Api** — REST controllers, exception-handling middleware, composition root
+- **TaskManagementSystem.Tests** — xUnit + Moq unit tests
+
+Tasks are identified by Guid `Id` in API routes.
 
 ---
 
@@ -8,10 +16,10 @@ A .NET 9 Web API for managing tasks and users. Tasks are looked up by **title** 
 
 - Create, update, delete, and retrieve users and tasks
 - Assign tasks to users (assignee must exist)
-- Validation using FluentValidation (due date cannot be in the past; Priority must be Low/Medium/High; Status must be To Do/In Progress/Done)
+- Validation using FluentValidation (due date cannot be in the past; Priority must be Low/Medium/High; Status must be Todo/InProgress/Done)
 - Repository pattern with JSON-file persistence (`Data/tasks.json`, `Data/users.json`)
 - Logging of critical operations via `ILogger`
-- Unit tests with xUnit and Moq (34 tests)
+- Unit tests with xUnit and Moq (38 tests)
 - API documentation with Swagger
 
 ---
@@ -34,7 +42,7 @@ From the `TaskManagementSystem` folder:
     dotnet restore
     ```
 
-2. **Build the project:**
+2. **Build the solution:**
     ```bash
     dotnet build
     ```
@@ -49,7 +57,7 @@ From the `TaskManagementSystem` folder:
 
 ### How to Test
 
-From the `TaskManagementSystem` folder (runs the `TaskManagementSystem.Tests` project in the solution):
+From the `TaskManagementSystem` folder:
 
 ```bash
 dotnet test
@@ -70,26 +78,34 @@ dotnet test
 
 ## API quick reference
 
-Tasks (`api/tasks`):
+Tasks (`/api/tasks`):
 
-- `GET api/tasks/getalltasks`
-- `POST api/tasks/createtask` — body: `{ "title", "description", "dueDate": "2026-12-31", "priority": "High", "assignedTo": { "username": "Tommy", "userID": "002" } }`
-- `GET api/tasks/gettaskbyid?taskId={title}`
-- `GET api/tasks/gettaskbyassignedto?assignedTo={username}`
-- `PUT api/tasks/updatetaskstatus?taskId={title}&newStatus=Done`
-- `PUT api/tasks/updatetaskpriority?taskId={title}&newPriority=High`
-- `PUT api/tasks/updatetaskduedate?taskId={title}&newDueDate=2026-12-31`
-- `PUT api/tasks/updatetaskassignedto?taskId={title}` — body: `{ "username": "Tommy", "userID": "002" }`
-- `DELETE api/tasks/deletetask?taskId={title}`
+- `GET /api/tasks` — list all
+- `GET /api/tasks/{id}` — get one (404 when missing)
+- `POST /api/tasks` — body: `{ "title", "description", "assignedTo": { "username", "userID" }, "priority": "High", "dueDate": "2026-12-31" }` → 201 + `Location`
+- `PUT /api/tasks/{id}` — full update: `{ "title", "description", "assignedTo", "priority", "status": "InProgress", "dueDate" }`
+- `PATCH /api/tasks/{id}/status` — `{ "status": "Done" }`
+- `PATCH /api/tasks/{id}/priority` — `{ "priority": "Low" }`
+- `PATCH /api/tasks/{id}/due-date` — `{ "dueDate": "2026-12-31" }`
+- `PATCH /api/tasks/{id}/assignee` — `{ "assignedTo": { "username", "userID" } }`
+- `DELETE /api/tasks/{id}` → 204
 
-Users (`api/users`): `createUser`, `getUserByUserID/{userID}`, `getUserByUsername/{username}`, `getAllUsers`, `updateUser/{userID}`, `deleteUserByID/{userID}`, `deleteUserByUsername/{username}`, `userIDExists/{userID}`, `usernameExists/{username}`.
+Users (`/api/users`):
+
+- `GET /api/users` — list all; `GET /api/users?username={name}` — look up by username
+- `GET /api/users/{id}` — get one
+- `GET /api/users/{id}/tasks` — tasks assigned to the user
+- `POST /api/users` — `{ "username", "userID" }` → 201 (409 on duplicate)
+- `PUT /api/users/{id}` — `{ "username" }`
+- `DELETE /api/users/{id}` → 204
 
 ---
 
 ## Notes
 
-- All validation errors return a 400 Bad Request with details; missing resources return 404.
+- Validation errors return 400 with details; missing resources return 404; duplicates return 409.
+- Enum values in JSON: Priority `Low`/`Medium`/`High`, Status `Todo`/`InProgress`/`Done`.
 - Data is persisted in JSON files under `Data/` for demo purposes.
-- For production, replace the repository implementations with a real database provider.
+- For production, replace the Infrastructure repositories with a real database provider (no Application/Api changes needed).
 
 ---
